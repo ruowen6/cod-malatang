@@ -1,0 +1,184 @@
+.scene2 {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  overflow-y: auto;
+}
+
+.receipt {
+  width: 300px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+  padding: 24px;
+  text-align: center;
+  margin: 24px 0;
+}
+
+.receipt h1 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
+.receipt-line {
+  border-top: 1px dashed #ccc;
+  margin: 12px 0;
+}
+
+.receipt-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.receipt-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.item-name {
+  font-weight: 500;
+}
+
+.item-count {
+  color: #888;
+}
+
+.total {
+  font-size: 15px;
+  color: #666;
+  margin: 4px 0 16px;
+}
+
+.empty {
+  color: #999;
+  padding: 20px 0;
+}
+
+/* Action buttons row */
+.action-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.confirm-btn {
+  background: #43a047;
+  color: #fff;
+}
+
+.order-btn {
+  background: #1e88e5;
+  color: #fff;
+}
+
+.back-btn {
+  width: 100%;
+  padding: 10px 28px;
+  border: none;
+  border-radius: 20px;
+  background: #e53935;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 90vw;
+  text-align: center;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* Receipt modal */
+.receipt-modal {
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-hint {
+  font-size: 14px;
+  color: #888;
+  margin: 0 0 12px;
+}
+
+.receipt-image-scroll {
+  overflow-y: auto;
+  max-height: 65vh;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.receipt-image {
+  display: block;
+  width: 320px;
+  max-width: 80vw;
+  height: auto;
+}
+
+/* QR modal */
+.qr-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.qr-text {
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+  margin: 0;
+}
+
+.qr-image {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.modal-close {
+  margin-top: 12px;
+  padding: 8px 32px;
+  border: none;
+  border-radius: 18px;
+  background: #666;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
