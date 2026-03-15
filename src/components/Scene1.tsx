@@ -8,6 +8,7 @@ export interface SelectedItem {
   uid: number;
   x: number;
   y: number;
+  size: number; // badge diameter in px
 }
 
 interface Scene1Props {
@@ -21,6 +22,36 @@ export default function Scene1({ onCheckout }: Scene1Props) {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const uidRef = useRef(0);
 
+  // Pre-generate a shuffled grid of well-distributed positions (5 rows × 3 cols = 15 slots)
+  const slotsRef = useRef<{ x: number; y: number }[]>([]);
+  const slotIndexRef = useRef(0);
+
+  if (slotsRef.current.length === 0) {
+    const cols = 3;
+    const rows = 5;
+    const positions: { x: number; y: number }[] = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        // Base grid: x 15%–85%, y 3%–38%
+        const baseX = 15 + (c / (cols - 1)) * 70;
+        const baseY = 3 + (r / (rows - 1)) * 35;
+        // Add jitter: ±8% x, ±3% y
+        const jitterX = (Math.random() - 0.5) * 16;
+        const jitterY = (Math.random() - 0.5) * 6;
+        positions.push({
+          x: Math.max(12, Math.min(88, baseX + jitterX)),
+          y: Math.max(2, Math.min(40, baseY + jitterY)),
+        });
+      }
+    }
+    // Fisher-Yates shuffle
+    for (let i = positions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [positions[i], positions[j]] = [positions[j], positions[i]];
+    }
+    slotsRef.current = positions;
+  }
+
   const handleRemove = useCallback((uid: number) => {
     setSelected(prev => prev.filter(item => item.uid !== uid));
   }, []);
@@ -29,10 +60,11 @@ export default function Scene1({ onCheckout }: Scene1Props) {
     setSelected(prev => {
       if (prev.length >= MAX_ITEMS) return prev;
       const uid = ++uidRef.current;
-      // random position within bowl area (percentage based)
-      const x = 20 + Math.random() * 60; // 20%–80% of bowl width
-      const y = 5 + Math.random() * 35;  // 5%–40% of bowl height (well within visible top half)
-      return [...prev, { menuItem: item, uid, x, y }];
+      const slot = slotsRef.current[slotIndexRef.current % slotsRef.current.length];
+      slotIndexRef.current++;
+      // Random diameter between 55px and 100px
+      const size = 55 + Math.random() * 45;
+      return [...prev, { menuItem: item, uid, x: slot.x, y: slot.y, size }];
     });
   }, []);
 
@@ -64,17 +96,27 @@ export default function Scene1({ onCheckout }: Scene1Props) {
   }, []);
 
   return (
-    <div className="scene1" style={{ backgroundImage: `url(${bgImage})` }}>
-      {/* Checkout button */}
-      <button
-        className="checkout-btn"
-        onClick={() => onCheckout(selected)}
-        disabled={selected.length === 0}
-      >
-        结账 ({selected.length}/{MAX_ITEMS})
-      </button>
+    <div className="scene1" style={{ backgroundImage: `url(${bgImage})` }} onContextMenu={e => e.preventDefault()}>
+      {/* NavBar */}
+      <div className="navbar">
+        <div className="navbar-left">
+          <span className="navbar-title">菜单</span>
+        </div>
+        <div className="navbar-center">
+          <span className="navbar-count">{selected.length}/{MAX_ITEMS}</span>
+        </div>
+        <div className="navbar-right">
+          <button
+            className="checkout-btn"
+            onClick={() => onCheckout(selected)}
+            disabled={selected.length === 0}
+          >
+            结账
+          </button>
+        </div>
+      </div>
 
-      {/* Menu grid - upper 2/3 */}
+      {/* Menu grid */}
       <div className="menu-grid">
         {menuItems.map(item => (
           <button
@@ -83,8 +125,7 @@ export default function Scene1({ onCheckout }: Scene1Props) {
             onClick={() => handleSelect(item)}
             disabled={selected.length >= MAX_ITEMS}
           >
-            <img src={item.icon} alt={item.name} className="menu-item-icon" />
-            <span className="menu-item-name">{item.name}</span>
+            <img src={item.icon} alt={item.name} className="menu-item-icon" draggable={false} onContextMenu={e => e.preventDefault()} />
           </button>
         ))}
       </div>
@@ -92,20 +133,28 @@ export default function Scene1({ onCheckout }: Scene1Props) {
       {/* Bowl area - lower 1/3 */}
       <div className="bowl-area">
         <div className="bowl">
-          {selected.map(sel => (
-            <img
-              key={sel.uid}
-              src={sel.menuItem.bowlIcon}
-              alt={sel.menuItem.name}
-              className="badge"
-              onClick={() => handleRemove(sel.uid)}
-              style={{
-                left: `calc(${sel.x}% + ${tilt.x * 30}px)`,
-                top: `${sel.y}%`,
-                cursor: 'pointer',
-              }}
-            />
-          ))}
+          {selected.map(sel => {
+            // Larger icons drift slower, smaller icons drift faster
+            const tiltStrength = (80 / sel.size) * 30;
+            return (
+              <img
+                key={sel.uid}
+                src={sel.menuItem.bowlIcon}
+                alt={sel.menuItem.name}
+                className="badge"
+                draggable={false}
+                onContextMenu={e => e.preventDefault()}
+                onClick={() => handleRemove(sel.uid)}
+                style={{
+                  width: sel.size,
+                  height: sel.size,
+                  left: `calc(${sel.x}% + ${tilt.x * tiltStrength}px)`,
+                  top: `${sel.y}%`,
+                  cursor: 'pointer',
+                }}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

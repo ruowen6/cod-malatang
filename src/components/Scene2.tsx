@@ -291,6 +291,7 @@ export default function Scene2({ items, onBack }: Scene2Props) {
         <div className="modal-overlay" onClick={() => setShowQR(false)}>
           <div className="modal-content qr-modal" onClick={e => e.stopPropagation()}>
             <p className="qr-text">在这里可以找到我们的通贩哦！</p>
+            <p className="qr-text">群号: 1077525788</p>
             <img src={qrCodeImg} alt="二维码" className="qr-image" />
             <button className="modal-close" onClick={() => setShowQR(false)}>
               关闭
