@@ -53,6 +53,7 @@ export default function Scene1({ onCheckout }: Scene1Props) {
   }
 
   const [removing, setRemoving] = useState<Set<number>>(new Set());
+  const [showHelp, setShowHelp] = useState(false);
 
   const handleRemove = useCallback((uid: number) => {
     setRemoving(prev => new Set(prev).add(uid));
@@ -72,8 +73,9 @@ export default function Scene1({ onCheckout }: Scene1Props) {
       const uid = ++uidRef.current;
       const slot = slotsRef.current[slotIndexRef.current % slotsRef.current.length];
       slotIndexRef.current++;
-      // Random diameter between 55px and 100px
-      const size = 55 + Math.random() * 45;
+      // Random diameter between 75px and 140px
+      // min diameter = 75; max diameter = 140
+      const size = 75 + Math.random() * 65;
       return [...prev, { menuItem: item, uid, x: slot.x, y: slot.y, size }];
     });
   }, []);
@@ -114,6 +116,7 @@ export default function Scene1({ onCheckout }: Scene1Props) {
         </div>
         <div className="navbar-center">
           <span className="navbar-count">{selected.length}/{MAX_ITEMS}</span>
+          <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="帮助">?</button>
         </div>
         <div className="navbar-right">
           <button
@@ -167,6 +170,22 @@ export default function Scene1({ onCheckout }: Scene1Props) {
           })}
         </div>
       </div>
+
+      {/* Help modal */}
+      {showHelp && (
+        <div className="help-overlay" onClick={() => setShowHelp(false)}>
+          <div className="help-modal" onClick={e => e.stopPropagation()}>
+            <h2>🍜 玩法说明</h2>
+            <ul>
+              <li>点击上方按钮选购“菜品”，最多可选 {MAX_ITEMS} 样</li>
+              <li>选中的“菜品”会出现在碗里</li>
+              <li>点击碗内图标可取消该“菜品”</li>
+              <li>选好后点击右上角「结账」，查看这碗麻辣烫里都有哪些干员——</li>
+            </ul>
+            <button className="help-close" onClick={() => setShowHelp(false)}>好耶!</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
