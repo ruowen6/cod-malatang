@@ -52,8 +52,18 @@ export default function Scene1({ onCheckout }: Scene1Props) {
     slotsRef.current = positions;
   }
 
+  const [removing, setRemoving] = useState<Set<number>>(new Set());
+
   const handleRemove = useCallback((uid: number) => {
-    setSelected(prev => prev.filter(item => item.uid !== uid));
+    setRemoving(prev => new Set(prev).add(uid));
+    setTimeout(() => {
+      setSelected(prev => prev.filter(item => item.uid !== uid));
+      setRemoving(prev => {
+        const next = new Set(prev);
+        next.delete(uid);
+        return next;
+      });
+    }, 200); // matches badge-vanish duration
   }, []);
 
   const handleSelect = useCallback((item: MenuItem) => {
@@ -141,10 +151,10 @@ export default function Scene1({ onCheckout }: Scene1Props) {
                 key={sel.uid}
                 src={sel.menuItem.bowlIcon}
                 alt={sel.menuItem.name}
-                className="badge"
+                className={`badge${removing.has(sel.uid) ? ' badge-vanish' : ''}`}
                 draggable={false}
                 onContextMenu={e => e.preventDefault()}
-                onClick={() => handleRemove(sel.uid)}
+                onClick={() => !removing.has(sel.uid) && handleRemove(sel.uid)}
                 style={{
                   width: sel.size,
                   height: sel.size,

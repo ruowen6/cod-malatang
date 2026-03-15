@@ -172,3 +172,23 @@
     transform: translate(-50%, -50%) scale(1);
   }
 }
+
+/* Disappear animation — reverse of badge-pop, faster */
+.badge-vanish {
+  animation: badge-vanish 0.2s ease-in forwards !important;
+}
+
+@keyframes badge-vanish {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+}
